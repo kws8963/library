@@ -1,0 +1,6 @@
+{
+  "name": "학급문고 스마트 대여장",
+  "description": "구글 스프레드시트와 실시간 연동되는 학생 자율 학급문고 대출/반납 웹앱",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
