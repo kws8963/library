@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>학급문고 스마트 대여장 - 교실 도서 대출/반납</title>
-  <meta name="description" content="구글 스프레드시트와 실시간 연동되는 학생 자율 학급문고 스마트 대여장 웹앱">
-  <meta property="og:title" content="학급문고 스마트 대여장">
-  <meta property="og:description" content="구글 스프레드시트와 연동되어 교실 책을 자유롭게 대출하고 반납할 수 있는 스마트 대여장">
+  <title>학급문고 스마트 서가 - 교실 도서 대출 · 반납</title>
+  <meta name="description" content="구글 스프레드시트와 실시간 연동되는 학생 자율 학급문고 스마트 서가 웹앱">
+  <meta property="og:title" content="학급문고 스마트 서가">
+  <meta property="og:description" content="구글 스프레드시트와 연동되어 교실 책을 자유롭게 대출하고 반납할 수 있는 스마트 서가">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="./style.css">
@@ -17,21 +17,21 @@
   <header class="navbar">
     <div class="nav-container">
       <a href="#" class="brand">
-        <div class="brand-icon">📚</div>
+        <div class="brand-icon">📖</div>
         <div class="brand-info">
-          <h1>우리 반 학급문고</h1>
-          <p>스마트 자율 대출 · 반납 시스템</p>
+          <h1>우리 반 스마트 서가</h1>
+          <p>자율 대출 · 반납 및 독서 이력 관리</p>
         </div>
       </a>
 
       <div class="nav-actions">
-        <!-- 연동 상태 배지 (클릭 시 설정 팝업) -->
+        <!-- 연동 상태 배지 -->
         <div id="connectionBadge" class="status-pill demo" title="클릭하여 구글 시트 연동 설정">
           <span class="status-dot"></span> 확인 중...
         </div>
 
         <button type="button" id="refreshBtn" class="btn btn-outline btn-sm" title="최신 상태 새로고침">
-          🔄 동기화
+          🔄 새로고침
         </button>
         <button type="button" id="openHistoryBtn" class="btn btn-outline btn-sm">
           📋 대여기록
@@ -53,29 +53,29 @@
     <section class="stats-banner">
       <div class="stat-card total">
         <div class="stat-info">
-          <h3>전체 도서</h3>
+          <h3>전체 보유 도서</h3>
           <div id="statTotal" class="stat-value">0</div>
         </div>
-        <div class="stat-icon">📖</div>
+        <div class="stat-icon">📚</div>
       </div>
       <div class="stat-card available">
         <div class="stat-info">
           <h3>대출 가능</h3>
-          <div id="statAvailable" class="stat-value" style="color: var(--success);">0</div>
+          <div id="statAvailable" class="stat-value" style="color: var(--bookstore-green);">0</div>
         </div>
-        <div class="stat-icon">🟢</div>
+        <div class="stat-icon">📗</div>
       </div>
       <div class="stat-card borrowed">
         <div class="stat-info">
-          <h3>대출 중인 책</h3>
-          <div id="statBorrowed" class="stat-value" style="color: var(--warning);">0</div>
+          <h3>현재 대출 중</h3>
+          <div id="statBorrowed" class="stat-value" style="color: var(--accent-borrowed);">0</div>
         </div>
         <div class="stat-icon">📙</div>
       </div>
       <div class="stat-card activity">
         <div class="stat-info">
-          <h3>오늘 대여/반납</h3>
-          <div id="statTodayActivity" class="stat-value" style="color: var(--primary);">0</div>
+          <h3>오늘 대여/반납 활동</h3>
+          <div id="statTodayActivity" class="stat-value" style="color: #4f46e5;">0</div>
         </div>
         <div class="stat-icon">✨</div>
       </div>
@@ -88,7 +88,20 @@
           <span class="step-badge">1단계</span>
           <h2>누가 책을 빌리거나 반납하나요?</h2>
         </div>
-        <span class="form-hint">이름 버튼을 누르거나 아래에 직접 이름을 입력하세요.</span>
+        <div class="step-actions">
+          <button type="button" id="toggleDeleteModeBtn" class="btn btn-outline btn-sm" title="학생 이름 옆의 삭제 버튼 켜기/끄기">
+            🗑️ 빠른 삭제 모드
+          </button>
+          <button type="button" id="openManageStudentsBtn" class="btn btn-outline btn-sm">
+            👥 학생 명단 관리
+          </button>
+        </div>
+      </div>
+
+      <!-- 삭제 모드 활성화 시 안내 바 -->
+      <div id="deleteModeBanner" class="manage-mode-banner" style="display: none;">
+        <span>⚠️ <strong>삭제 모드 활성화:</strong> 삭제하려는 학생 이름 옆의 <strong>[✕]</strong> 버튼을 누르면 목록에서 제외됩니다.</span>
+        <button type="button" id="closeDeleteModeBtn" class="btn btn-sm btn-outline" style="background:#fff; padding: 2px 8px;">완료</button>
       </div>
 
       <!-- 현재 선택된 학생 표시 바 -->
@@ -96,12 +109,12 @@
         <div class="student-info-left">
           <div class="student-avatar">👤</div>
           <div class="student-details">
-            <span class="label">선택된 학생</span>
+            <span class="label">현재 선택된 학생</span>
             <div id="selectedStudentName" class="name">-</div>
           </div>
         </div>
         <button type="button" id="clearStudentBtn" class="btn btn-outline btn-sm">
-          다른 학생 선택 ✖
+          선택 해제 ✕
         </button>
       </div>
 
@@ -110,11 +123,11 @@
         <!-- script.js에서 동적 생성 -->
       </div>
 
-      <!-- 학생 이름 직접 입력 박스 -->
+      <!-- 학생 이름 직접 추가 박스 -->
       <div class="custom-student-box">
-        <input type="text" id="customStudentInput" class="custom-student-input" placeholder="학생 이름이 목록에 없으면 여기에 입력 후 [선택] 클릭" maxlength="10">
+        <input type="text" id="customStudentInput" class="custom-student-input" placeholder="새로운 학생 이름을 입력하여 명단에 등록하세요" maxlength="10">
         <button type="button" id="addCustomStudentBtn" class="btn btn-outline">
-          선택 및 추가
+          ➕ 학생 명단에 등록
         </button>
       </div>
     </section>
@@ -132,12 +145,12 @@
       <div class="catalog-controls">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="책 제목, 도서번호, 대출 학생 이름으로 검색...">
+          <input type="text" id="searchInput" placeholder="도서명, 도서번호, 대출자 이름으로 검색...">
         </div>
 
         <div class="filter-pills">
           <button type="button" class="filter-btn active" data-filter="all">전체 도서</button>
-          <button type="button" class="filter-btn" data-filter="available">대출 가능만</button>
+          <button type="button" class="filter-btn" data-filter="available">대출 가능</button>
           <button type="button" class="filter-btn" data-filter="borrowed">대출 중인 책</button>
         </div>
       </div>
@@ -149,9 +162,9 @@
 
       <!-- 검색 결과 없을 때 빈 상태 -->
       <div id="emptyState" class="empty-state" style="display: none;">
-        <div class="empty-icon">🔎</div>
-        <div class="empty-title">조건에 맞는 도서가 없습니다.</div>
-        <p class="empty-desc">검색어를 변경하거나 다른 필터를 선택해 보세요.</p>
+        <div class="empty-icon" style="font-size: 40px; margin-bottom: 8px;">🔎</div>
+        <div class="empty-title" style="font-size: 1.1rem; font-weight: 700;">조건에 맞는 도서를 찾을 수 없습니다.</div>
+        <p class="empty-desc" style="font-size: 0.85rem; color: var(--ink-500); margin-top: 4px;">다른 도서명이나 번호로 검색해 보세요.</p>
       </div>
     </section>
 
@@ -159,7 +172,7 @@
 
   <!-- ======================== 모달 팝업 모음 ======================== -->
 
-  <!-- 1. 대출 확인 모달 -->
+  <!-- 1. 대출 확인 모달 (학생 명단에서 선택 필수, 텍스트 직접 입력 불가) -->
   <div id="borrowModal" class="modal-overlay">
     <div class="modal-container">
       <div class="modal-header">
@@ -179,9 +192,12 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="borrowStudentInput">대출할 학생 이름</label>
-          <input type="text" id="borrowStudentInput" class="form-input" placeholder="학생 이름을 입력하세요">
-          <span id="borrowStudentHint" class="form-hint"></span>
+          <label class="form-label" for="borrowStudentSelect">대출할 학생 선택</label>
+          <!-- 텍스트 입력이 아닌 등록된 학생 목록 드롭다운 선택 -->
+          <select id="borrowStudentSelect" class="form-select" required>
+            <!-- script.js에서 동적으로 옵션 구성 -->
+          </select>
+          <span id="borrowStudentHint" class="form-hint">목록에 없는 학생은 1단계에서 먼저 명단에 등록해 주세요.</span>
         </div>
       </div>
       <div class="modal-footer">
@@ -199,7 +215,7 @@
         <button type="button" class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="action-summary-box" style="background: var(--success-light); border-color: rgba(16, 185, 129, 0.3);">
+        <div class="action-summary-box" style="background: var(--bookstore-green-light); border-color: var(--bookstore-green-border);">
           <div class="summary-row">
             <span class="summary-label">도서 번호</span>
             <span id="returnBookId" class="summary-val">-</span>
@@ -209,14 +225,20 @@
             <span id="returnBookTitle" class="summary-val">-</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">빌려간 학생</span>
-            <span id="returnBorrowerName" class="summary-val" style="color: var(--warning);">-</span>
+            <span class="summary-label">현재 대출자</span>
+            <span id="returnBorrowerName" class="summary-val" style="color: var(--accent-borrowed);">-</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">대출 일시</span>
+            <span id="returnBorrowTime" class="summary-val">-</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="returnerStudentInput">반납하는 학생 (선택)</label>
-          <input type="text" id="returnerStudentInput" class="form-input" placeholder="반납자 이름">
+          <label class="form-label" for="returnerStudentSelect">반납하는 학생 확인 (선택)</label>
+          <select id="returnerStudentSelect" class="form-select">
+            <!-- script.js에서 동적 채움 -->
+          </select>
           <span class="form-hint">대출자 본인이 아니어도 반납할 수 있습니다.</span>
         </div>
       </div>
@@ -227,7 +249,32 @@
     </div>
   </div>
 
-  <!-- 3. 대여 기록 모달 (전체 / 도서별 / 학생별) -->
+  <!-- 3. 학생 명단 관리 모달 (추가 / 개별 삭제 / 초기화) -->
+  <div id="manageStudentsModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>👥 학생 명단 관리</h3>
+        <button type="button" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="form-hint">현재 등록된 학생 목록입니다. 목록에서 제외할 학생의 <strong>[삭제]</strong> 버튼을 누르세요.</p>
+        
+        <div id="studentManageList" class="student-manage-list">
+          <!-- script.js에서 렌더링 -->
+        </div>
+
+        <div class="custom-student-box" style="margin-top: 4px;">
+          <input type="text" id="modalNewStudentInput" class="custom-student-input" placeholder="새 학생 이름 입력">
+          <button type="button" id="modalAddStudentBtn" class="btn btn-primary btn-sm">추가</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline btn-modal-cancel">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 대여 기록 모달 (전체 / 도서별 / 학생별) -->
   <div id="historyModal" class="modal-overlay">
     <div class="modal-container" style="max-width: 650px;">
       <div class="modal-header">
@@ -250,8 +297,8 @@
         <!-- 탭 2: 도서별 이력 -->
         <div id="historyTabBook" style="display: none;">
           <div class="form-group" style="margin-bottom: 12px;">
-            <select id="historyBookFilter" class="form-input"></select>
-            <div id="bookHistorySummary" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 4px;"></div>
+            <select id="historyBookFilter" class="form-select"></select>
+            <div id="bookHistorySummary" style="font-size: 0.85rem; font-weight: 700; color: var(--bookstore-green); margin-top: 4px;"></div>
           </div>
           <div id="bookHistoryList" class="log-timeline"></div>
         </div>
@@ -259,8 +306,8 @@
         <!-- 탭 3: 학생별 이력 -->
         <div id="historyTabStudent" style="display: none;">
           <div class="form-group" style="margin-bottom: 12px;">
-            <select id="historyStudentFilter" class="form-input"></select>
-            <div id="studentHistorySummary" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 4px;"></div>
+            <select id="historyStudentFilter" class="form-select"></select>
+            <div id="studentHistorySummary" style="font-size: 0.85rem; font-weight: 700; color: var(--bookstore-green); margin-top: 4px;"></div>
           </div>
           <div id="studentHistoryList" class="log-timeline"></div>
         </div>
@@ -271,7 +318,7 @@
     </div>
   </div>
 
-  <!-- 4. 새 도서 등록 모달 -->
+  <!-- 5. 새 도서 등록 모달 -->
   <div id="addBookModal" class="modal-overlay">
     <div class="modal-container">
       <div class="modal-header">
@@ -283,11 +330,11 @@
           <div class="form-group">
             <label class="form-label" for="newBookId">도서 번호</label>
             <input type="text" id="newBookId" class="form-input" placeholder="예: B-011" required>
-            <span class="form-hint">책 등에 붙어 있는 식별 라벨 번호를 적어주세요.</span>
+            <span class="form-hint">책 등에 부착된 라벨 또는 등록 번호를 입력하세요.</span>
           </div>
           <div class="form-group">
             <label class="form-label" for="newBookTitle">도서 제목</label>
-            <input type="text" id="newBookTitle" class="form-input" placeholder="책 표지에 적힌 제목" required>
+            <input type="text" id="newBookTitle" class="form-input" placeholder="책 표지의 제목" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -298,7 +345,7 @@
     </div>
   </div>
 
-  <!-- 5. 구글 시트 연동 설정 모달 -->
+  <!-- 6. 구글 시트 연동 설정 모달 -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal-container">
       <div class="modal-header">
@@ -314,7 +361,7 @@
           </span>
         </div>
 
-        <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 14px; font-size: 0.85rem; line-height: 1.6;">
+        <div style="background: var(--ink-50); border: 1px solid var(--ink-200); border-radius: var(--radius-xs); padding: 14px; font-size: 0.85rem; line-height: 1.6;">
           <strong>💡 연동 가이드 요약 (상세 내용은 setup.md 참고)</strong>
           <ol style="padding-left: 20px; margin-top: 6px;">
             <li>스프레드시트에 '도서목록', '대여기록' 탭 준비</li>
@@ -326,8 +373,8 @@
         </div>
 
         <div style="display: flex; justify-content: flex-start; margin-top: 4px;">
-          <button type="button" id="resetDataBtn" class="btn btn-outline btn-sm" style="color: var(--danger);">
-            🔄 기본 예시 데이터로 초기화
+          <button type="button" id="resetDataBtn" class="btn btn-outline btn-sm" style="color: var(--danger-red);">
+            🔄 기본 예시 도서 및 학생 데이터로 초기화
           </button>
         </div>
       </div>
@@ -341,7 +388,7 @@
   <!-- 로딩 오버레이 -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="spinner"></div>
-    <div id="loadingText" style="font-weight: 700; color: var(--gray-800); font-size: 0.95rem;">처리 중...</div>
+    <div id="loadingText" style="font-weight: 700; color: var(--ink-800); font-size: 0.95rem;">처리 중...</div>
   </div>
 
   <!-- 토스트 알림 컨테이너 -->
